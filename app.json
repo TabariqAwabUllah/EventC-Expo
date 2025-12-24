@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "EventManagement",
-    "slug": "EventManagement",
+    "slug": "eventmanagement",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "32f65e56-a86b-40fe-9904-9d1791208bda"
+      }
+    },
+    "owner": "tabariqawabullah"
   }
 }
