@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const EventsList = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,7 +50,13 @@ const EventsList = () => {
       style={styles.eventCard}
       onPress={() => router.push({
         pathname: '/events/detail',
-        params: { event: JSON.stringify(item) }
+        params: {
+          id: item.id,
+          title: item.title,
+          date: item.date,
+          location: item.location,
+          description: item.description
+        }
       })}
     >
       <Text style={styles.eventTitle}>{item.title}</Text>
@@ -184,7 +190,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 24,
+    bottom: 60,
     right: 24,
     width: 56,
     height: 56,

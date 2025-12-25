@@ -1,12 +1,13 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { addDoc, collection } from 'firebase/firestore';
-import { useState } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { doc, updateDoc } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { db } from '../../FirebaseConfig';
 
-const AddEvent = () => {
+const EditEvent = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -16,9 +17,29 @@ const AddEvent = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    // Pre-fill form with existing event data
+    if (params.title) setTitle(params.title);
+    if (params.description) setDescription(params.description);
+
+    // Parse date and time from combined date string
+    if (params.date) {
+      const dateStr = params.date;
+      if (dateStr.includes(' at ')) {
+        const [datePart, timePart] = dateStr.split(' at ');
+        setDate(datePart);
+        setTime(timePart);
+      } else {
+        setDate(dateStr);
+      }
+    }
+
+    if (params.location) setLocation(params.location);
+    if (params.capacity) setCapacity(params.capacity.toString());
+  }, [params]);
+
+  const handleUpdate = async () => {
     // Reset error
-    console.log('Saving new event...');
     setError('');
 
     // Validation
@@ -33,7 +54,7 @@ const AddEvent = () => {
     if (!date.trim()) {
       setError('Date is required.');
       return;
-    } 
+    }
     if (!time.trim()) {
       setError('Time is required.');
       return;
@@ -50,35 +71,27 @@ const AddEvent = () => {
     try {
       setLoading(true);
 
-      // Add event to Firestore
-      await addDoc(collection(db, 'events'), {
+      // Update event in Firestore
+      await updateDoc(doc(db, 'events', params.id), {
         title: title.trim(),
         description: description.trim(),
         date: date.trim(),
         time: time.trim(),
         location: location.trim(),
         capacity: parseInt(capacity),
-        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
       // Show success message
-      Alert.alert('Success', 'Event created successfully!', [
+      Alert.alert('Success', 'Event updated successfully!', [
         {
           text: 'OK',
           onPress: () => router.back(),
         },
       ]);
-
-      // Clear form
-      setTitle('');
-      setDescription('');
-      setDate('');
-      setTime('');
-      setLocation('');
-      setCapacity('');
     } catch (err) {
-      console.error('Error adding event: ', err);
-      setError('Failed to save event. Please try again.');
+      console.error('Error updating event: ', err);
+      setError('Failed to update event. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -91,7 +104,7 @@ const AddEvent = () => {
         <TouchableOpacity onPress={() => router.back()}>
           <MaterialCommunityIcons name="arrow-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Event</Text>
+        <Text style={styles.headerTitle}>Edit Event</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -199,14 +212,14 @@ const AddEvent = () => {
           <Text style={styles.uploadSubtext}>PNG, JPG, up to 5MB</Text>
         </TouchableOpacity> */}
 
-        {/* Save Button */}
+        {/* Update Button */}
         <TouchableOpacity
           style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-          onPress={handleSave}
+          onPress={handleUpdate}
           disabled={loading}
         >
           <Text style={styles.saveButtonText}>
-            {loading ? 'Saving...' : 'Save Event'}
+            {loading ? 'Updating...' : 'Update Event'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -214,7 +227,7 @@ const AddEvent = () => {
   );
 };
 
-export default AddEvent;
+export default EditEvent;
 
 const styles = StyleSheet.create({
   container: {
