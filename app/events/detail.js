@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import { db } from '../../FirebaseConfig';
-import { collection, addDoc, deleteDoc, doc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, query, where, getDocs, getDoc } from 'firebase/firestore';
 
 const EventDetail = () => {
   const params = useLocalSearchParams();
@@ -95,17 +95,32 @@ const EventDetail = () => {
     }
   };
 
-  const handleEdit = () => {
-    router.push({
-      pathname: '/events/edit',
-      params: {
-        id: event.id,
-        title: event.title,
-        date: event.date,
-        location: event.location,
-        description: event.description
+  const handleEdit = async () => {
+    try {
+      // Fetch full event data from Firestore
+      const eventDoc = await getDoc(doc(db, 'events', event.id));
+
+      if (eventDoc.exists()) {
+        const eventData = eventDoc.data();
+        router.push({
+          pathname: '/events/edit',
+          params: {
+            id: event.id,
+            title: eventData.title,
+            description: eventData.description,
+            date: eventData.date,
+            time: eventData.time,
+            location: eventData.location,
+            capacity: eventData.capacity.toString()
+          }
+        });
+      } else {
+        Alert.alert('Error', 'Event not found');
       }
-    });
+    } catch (error) {
+      console.error('Error fetching event data: ', error);
+      Alert.alert('Error', 'Failed to load event data');
+    }
   };
 
   const handleDelete = () => {

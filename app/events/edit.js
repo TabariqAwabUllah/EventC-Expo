@@ -21,21 +21,10 @@ const EditEvent = () => {
     // Pre-fill form with existing event data
     if (params.title) setTitle(params.title);
     if (params.description) setDescription(params.description);
-
-    // Parse date and time from combined date string
-    if (params.date) {
-      const dateStr = params.date;
-      if (dateStr.includes(' at ')) {
-        const [datePart, timePart] = dateStr.split(' at ');
-        setDate(datePart);
-        setTime(timePart);
-      } else {
-        setDate(dateStr);
-      }
-    }
-
+    if (params.date) setDate(params.date);
+    if (params.time) setTime(params.time);
     if (params.location) setLocation(params.location);
-    if (params.capacity) setCapacity(params.capacity.toString());
+    if (params.capacity) setCapacity(params.capacity);
   }, [params]);
 
   const handleUpdate = async () => {
