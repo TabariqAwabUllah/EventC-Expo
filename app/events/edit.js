@@ -8,24 +8,14 @@ import { db } from '../../FirebaseConfig';
 const EditEvent = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [location, setLocation] = useState('');
-  const [capacity, setCapacity] = useState('');
+  const [title, setTitle] = useState(params.title || '');
+  const [description, setDescription] = useState(params.description || '');
+  const [date, setDate] = useState(params.date || '');
+  const [time, setTime] = useState(params.time || '');
+  const [location, setLocation] = useState(params.location || '');
+  const [capacity, setCapacity] = useState(params.capacity || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Pre-fill form with existing event data
-    if (params.title) setTitle(params.title);
-    if (params.description) setDescription(params.description);
-    if (params.date) setDate(params.date);
-    if (params.time) setTime(params.time);
-    if (params.location) setLocation(params.location);
-    if (params.capacity) setCapacity(params.capacity);
-  }, [params]);
 
   const handleUpdate = async () => {
     // Reset error
